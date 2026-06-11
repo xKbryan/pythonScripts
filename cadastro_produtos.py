@@ -49,6 +49,8 @@ def adicionar_colunas_produtos():
         if nome_coluna not in colunas_existentes:
             cursor.execute(f"ALTER TABLE produtos ADD COLUMN {nome_coluna} {tipo_coluna}")
 
+    conexao.commit()
+
 
 adicionar_colunas_produtos()
 
@@ -123,6 +125,7 @@ def real_opcional(campo, nome_campo):
 
 
 def carregar_produtos():
+    adicionar_colunas_produtos()
     lista_produtos.delete(*lista_produtos.get_children())
     combo_produto["values"] = []
 
