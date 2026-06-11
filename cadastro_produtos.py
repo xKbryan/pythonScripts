@@ -31,6 +31,27 @@ cursor.execute(
     """
 )
 
+
+def adicionar_colunas_produtos():
+    colunas_necessarias = {
+        "validade": "TEXT",
+        "cor": "TEXT",
+        "textura": "TEXT",
+        "peso": "REAL",
+        "unidade_medida": "TEXT",
+        "aplicacao": "TEXT",
+    }
+
+    cursor.execute("PRAGMA table_info(produtos)")
+    colunas_existentes = {coluna[1] for coluna in cursor.fetchall()}
+
+    for nome_coluna, tipo_coluna in colunas_necessarias.items():
+        if nome_coluna not in colunas_existentes:
+            cursor.execute(f"ALTER TABLE produtos ADD COLUMN {nome_coluna} {tipo_coluna}")
+
+
+adicionar_colunas_produtos()
+
 cursor.execute(
     """
     CREATE TABLE IF NOT EXISTS movimentacoes (
@@ -168,7 +189,10 @@ def cadastrar_produto():
     estoque_minimo = inteiro_obrigatorio(entrada_minimo, "Estoque Minimo")
     peso = real_opcional(entrada_peso, "Peso")
 
-    if nome is None or quantidade is None or estoque_minimo is None or peso is None:
+    if nome is None or quantidade is None or estoque_minimo is None:
+        return
+
+    if entrada_peso.get().strip() and peso is None:
         return
 
     validade = entrada_validade.get().strip()
